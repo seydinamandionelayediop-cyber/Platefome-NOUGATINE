@@ -1,45 +1,421 @@
 const supabaseClient = supabase.createClient(
   "https://rjnuoslhxwawiyvvtjlc.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJqbnVvc2xoeHdhd2l5dnZ0amxjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNjg3NTgsImV4cCI6MjA5NTY0NDc1OH0.nJUeFhELfY9UFtadmtPt1cUPqkGipEEwcj5eR5N-Zdc"
+  "TON_ANON_KEY_ICI"
 );
-const $ = (s, r=document)=>r.querySelector(s); const $$=(s,r=document)=>[...r.querySelectorAll(s)];
-const KEY='nougatine_dark_v1';
-const icon=(name)=>({dash:'<svg class="ico" viewBox="0 0 24 24"><path d="M3 13h8V3H3zM13 21h8V11h-8zM13 3h8v6h-8zM3 21h8v-6H3z"/></svg>',users:'<svg class="ico" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',event:'<svg class="ico" viewBox="0 0 24 24"><path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></svg>',robe:'<svg class="ico" viewBox="0 0 24 24"><path d="M6 3h12l2 5-4 2v11H8V10L4 8z"/></svg>',stats:'<svg class="ico" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 16l4-5 3 3 5-8"/></svg>',map:'<svg class="ico" viewBox="0 0 24 24"><path d="M9 18l-6 3V6l6-3 6 3 6-3v15l-6 3-6-3z"/><path d="M9 3v15M15 6v15"/></svg>'}[name]||'');
-function seed(){return {users:[{id:'u1',nom:'Administrateur Général',email:'admin@nougatine.sn',password:'admin123',role:'admin_general',phone:'',photo:''},{id:'u2',nom:'Responsable Démo',email:'resp@nougatine.sn',password:'resp123',role:'responsable',phone:'',photo:''},{id:'u3',nom:'Awa Agent',email:'agent@nougatine.sn',password:'agent123',role:'agent',phone:'771234567',sexe:'Femme',taille:'M',competences:'Accueil, VIP',photo:''},{id:'u4',nom:'Garde Robe',email:'garde@nougatine.sn',password:'garde123',role:'garde_robe',phone:'',photo:''}],events:[{id:'e1',titre:'Salon International de Dakar',date:'2026-06-08',heure:'08:00 - 18:00',lieu:'CICAD',prix:'80000',briefing:'Accueil, orientation et accompagnement VIP.',dress:'Noir classique',itineraire:'https://maps.google.com',responsable:'u2'}],assignments:[{id:'a1',eventId:'e1',agentId:'u3',poste:'Accueil',statut:'en_attente'}],wardrobe:[{id:'w1',nom:'Tailleur noir',categorie:'Femme',quantite:12,statut:'Disponible'},{id:'w2',nom:'Costume noir',categorie:'Homme',quantite:8,statut:'Disponible'},{id:'w3',nom:'Talkie-walkie',categorie:'Outils',quantite:6,statut:'Disponible'}],current:null};}
-let db=JSON.parse(localStorage.getItem(KEY)||'null')||seed(); const save=()=>localStorage.setItem(KEY,JSON.stringify(db)); const uid=(p='id')=>p+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
-function toast(t){let x=document.createElement('div');x.className='toast';x.textContent=t;document.body.appendChild(x);setTimeout(()=>x.remove(),2400)}
-function img(u,txt='N'){return u?`<img class="avatar" src="${u}" alt="">`:`<div class="avatar">${txt[0]||'N'}</div>`}
-function app(){ db.current ? renderShell() : renderLogin(); }
-function renderLogin(){ $('#app').innerHTML=`<div class="login"><img class="login-bg-logo" src="assets/logo.png"><div class="login-card"><div class="hero"><div><img class="logo" src="assets/logo.png"><h1>Plateforme interne Nougatine Accueil</h1><p>Gestion dark premium des agents, responsables, événements, convocations et garde-robe.</p><div class="badge-row"><span class="badge">Dark mode</span><span class="badge">Photos agents</span><span class="badge">GitHub / Vercel</span></div></div><p class="hint">Comptes test : <span class="kbd">admin@nougatine.sn</span> / <span class="kbd">admin123</span></p></div><div class="login-form"><div class="tabs"><button class="tab active">Connexion</button><button class="tab" onclick="showFirstAdmin()">1er admin</button></div><h2>Connexion</h2><div class="field"><label>Email</label><input id="email" class="input" value="admin@nougatine.sn"></div><div class="field"><label>Mot de passe</label><input id="pass" class="input" type="password" value="admin123"></div><button class="btn full" onclick="login()">Se connecter</button><p class="hint">Responsable : resp@nougatine.sn / resp123<br>Agent : agent@nougatine.sn / agent123<br>Garde-robe : garde@nougatine.sn / garde123</p></div></div></div>`;}
-function showFirstAdmin(){ $('.login-form').innerHTML=`<div class="tabs"><button class="tab" onclick="renderLogin()">Connexion</button><button class="tab active">1er admin</button></div><h2>Créer le premier admin</h2><div class="field"><label>Nom</label><input id="faNom" class="input" value="Administrateur Général"></div><div class="field"><label>Email</label><input id="faEmail" class="input" value="admin@nougatine.sn"></div><div class="field"><label>Mot de passe</label><input id="faPass" class="input" type="password" value="admin123"></div><button class="btn full" onclick="firstAdmin()">Créer / Réinitialiser admin</button>`}
-function firstAdmin(){let email=$('#faEmail').value, pass=$('#faPass').value, nom=$('#faNom').value;let u=db.users.find(x=>x.role==='admin_general'); if(u){Object.assign(u,{email,password:pass,nom})}else db.users.push({id:uid('u'),nom,email,password:pass,role:'admin_general'}); save();toast('Admin prêt');renderLogin()}
-function login(){let u=db.users.find(x=>x.email===$('#email').value.trim()&&x.password===$('#pass').value); if(!u)return toast('Identifiants incorrects'); db.current=u.id; save(); app();}
-function logout(){db.current=null;save();app()} const me=()=>db.users.find(u=>u.id===db.current);
-function renderShell(page='dashboard'){let u=me();let nav=[]; if(u.role==='admin_general') nav=['dashboard','responsables','agents','events','assign','wardrobe','stats']; if(u.role==='responsable') nav=['dashboard','agents','events','assign','wardrobe','stats']; if(u.role==='agent') nav=['dashboard','myEvents','stats']; if(u.role==='garde_robe') nav=['dashboard','wardrobe'];
-$('#app').innerHTML=`<div class="shell"><aside class="side" id="side"><div class="brand"><img src="assets/logo.png"><div><strong>Nougatine</strong><span>Accueil interne</span></div></div><nav class="nav">${nav.map(n=>`<button data-page="${n}">${icon(n==='responsables'||n==='agents'?'users':n==='events'||n==='myEvents'||n==='assign'?'event':n==='wardrobe'?'robe':n==='stats'?'stats':'dash')} ${label(n)}</button>`).join('')}</nav><div class="side-foot"><button class="btn ghost full" onclick="logout()">Déconnexion</button></div></aside><main class="main"><header class="topbar"><button class="btn ghost menu" onclick="$('#side').classList.toggle('open')">☰</button><div><h2 id="pageTitle">Dashboard</h2><p id="roleLabel" class="hint">${roleName(u.role)}</p></div><div class="pill">${img(u.photo,u.nom)}<span>${u.nom}</span></div></header><section id="content"></section></main></div>`; $$('.nav button').forEach(b=>b.onclick=()=>renderPage(b.dataset.page)); renderPage(page)}
-function label(n){return {dashboard:'Dashboard',responsables:'Responsables',agents:'Agents',events:'Événements',assign:'Assignations',wardrobe:'Garde-robe',stats:'Statistiques',myEvents:'Mes événements'}[n]||n} function roleName(r){return {admin_general:'Administrateur général',responsable:'Responsable',agent:'Agent Nougatine',garde_robe:'Gestionnaire garde-robe'}[r]}
-function renderPage(p){$$('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===p)); $('#pageTitle').textContent=label(p); if(p==='dashboard')dashboard(); if(p==='responsables')usersPage('responsable'); if(p==='agents')usersPage('agent'); if(p==='events')eventsPage(); if(p==='assign')assignPage(); if(p==='wardrobe')wardrobePage(); if(p==='stats')statsPage(); if(p==='myEvents')myEventsPage();}
-function dashboard(){let agents=db.users.filter(u=>u.role==='agent');let ev=db.events;let conf=db.assignments.filter(a=>a.statut==='confirme').length;$('#content').innerHTML=`<div class="grid cards"><div class="card stat"><div><span>Agents</span><b>${agents.length}</b></div>${icon('users')}</div><div class="card stat"><div><span>Événements</span><b>${ev.length}</b></div>${icon('event')}</div><div class="card stat"><div><span>Confirmations</span><b>${conf}</b></div>${icon('dash')}</div><div class="card stat"><div><span>Items garde-robe</span><b>${db.wardrobe.length}</b></div>${icon('robe')}</div></div><div class="grid two"><div class="card"><h3>Prochains événements</h3>${eventTable(db.events.slice(0,5))}</div><div class="card"><h3>Confirmations récentes</h3>${assignmentList()}</div></div>`}
-function usersPage(role){let list=db.users.filter(u=>u.role===role); let can=me().role!=='agent'; $('#content').innerHTML=`<div class="section-head"><h3>${role==='agent'?'Agents Nougatine':'Responsables'}</h3>${can?`<button class="btn" onclick="userModal('${role}')">Créer</button>`:''}</div><div class="card"><table class="table"><tr><th>Profil</th><th>Contact</th><th>Détails</th><th>Actions</th></tr>${list.map(u=>`<tr><td><div class="agent-line">${img(u.photo,u.nom)}<div><b>${u.nom}</b><br><span class="hint">${roleName(u.role)}</span></div></div></td><td>${u.email}<br><span class="hint">${u.phone||''}</span></td><td>${u.sexe||''} ${u.taille?'- Taille '+u.taille:''}<br><span class="hint">${u.competences||''}</span></td><td class="row-actions"><button class="btn ghost small" onclick="userModal('${role}','${u.id}')">Modifier</button><button class="btn danger small" onclick="delUser('${u.id}')">Supprimer</button></td></tr>`).join('')}</table><div class="mobile-cards">${list.map(u=>`<div class="card"><div class="agent-line">${img(u.photo,u.nom)}<div><b>${u.nom}</b><p class="hint">${u.email}</p></div></div><div class="row-actions"><button class="btn ghost small" onclick="userModal('${role}','${u.id}')">Modifier</button><button class="btn danger small" onclick="delUser('${u.id}')">Supprimer</button></div></div>`).join('')}</div></div>`}
-function readFile(input,cb){let f=input.files[0]; if(!f)return cb(''); let r=new FileReader(); r.onload=()=>cb(r.result); r.readAsDataURL(f)}
-function userModal(role,id){let u=id?db.users.find(x=>x.id===id):{role}; modal(`<h3>${id?'Modifier':'Créer'} ${roleName(role)}</h3><div class="form-grid"><div class="field"><label>Photo</label><input id="photo" type="file" accept="image/*" class="input"><img id="prev" class="photo-preview" src="${u.photo||''}"></div><div class="field"><label>Nom</label><input id="nom" class="input" value="${u.nom||''}"></div><div class="field"><label>Email</label><input id="emailU" class="input" value="${u.email||''}"></div><div class="field"><label>Mot de passe</label><input id="password" class="input" value="${u.password||'123456'}"></div><div class="field"><label>Téléphone</label><input id="phone" class="input" value="${u.phone||''}"></div><div class="field"><label>Sexe</label><select id="sexe" class="select"><option></option><option ${u.sexe==='Femme'?'selected':''}>Femme</option><option ${u.sexe==='Homme'?'selected':''}>Homme</option></select></div><div class="field"><label>Taille tenue</label><input id="taille" class="input" value="${u.taille||''}"></div><div class="field"><label>Compétences</label><input id="competences" class="input" value="${u.competences||''}"></div></div><div class="row-actions"><button class="btn" id="saveU">Enregistrer</button><button class="btn ghost" onclick="closeModal()">Annuler</button></div>`); $('#photo').onchange=e=>readFile(e.target,d=>{$('#prev').src=d;$('#prev').dataset.photo=d}); $('#saveU').onclick=()=>{let data={id:id||uid('u'),role,nom:$('#nom').value,email:$('#emailU').value,password:$('#password').value,phone:$('#phone').value,sexe:$('#sexe').value,taille:$('#taille').value,competences:$('#competences').value,photo:$('#prev').dataset.photo||u.photo||''}; if(id) Object.assign(u,data); else db.users.push(data); save(); closeModal(); renderPage(role==='responsable'?'responsables':'agents'); toast('Profil enregistré')};}
-function delUser(id){if(!confirm('Supprimer ce profil ?'))return; db.users=db.users.filter(u=>u.id!==id); db.assignments=db.assignments.filter(a=>a.agentId!==id); save();renderPage('agents')}
-function eventsPage(){let list=db.events;$('#content').innerHTML=`<div class="section-head"><h3>Événements</h3><button class="btn" onclick="eventModal()">Créer événement</button></div><div class="card">${eventTable(list,true)}</div>`}
-function eventTable(list,actions=false){return `<table class="table"><tr><th>Événement</th><th>Date</th><th>Lieu</th><th>Prix</th>${actions?'<th>Actions</th>':''}</tr>${list.map(e=>`<tr><td><b>${e.titre}</b><br><span class="hint">${e.briefing||''}</span></td><td>${e.date}<br><span class="hint">${e.heure}</span></td><td>${e.lieu}<br><a class="hint" href="${e.itineraire||'#'}" target="_blank">Itinéraire</a></td><td>${e.prix||0} FCFA</td>${actions?`<td class="row-actions"><button class="btn ghost small" onclick="eventModal('${e.id}')">Modifier</button><button class="btn danger small" onclick="delEvent('${e.id}')">Supprimer</button></td>`:''}</tr>`).join('')}</table><div class="mobile-cards">${list.map(e=>`<div class="card"><b>${e.titre}</b><p class="hint">${e.date} • ${e.lieu}</p></div>`).join('')}</div>`}
-function eventModal(id){let e=id?db.events.find(x=>x.id===id):{}; modal(`<h3>${id?'Modifier':'Créer'} événement</h3><div class="form-grid"><div class="field"><label>Titre</label><input id="titre" class="input" value="${e.titre||''}"></div><div class="field"><label>Lieu</label><input id="lieu" class="input" value="${e.lieu||''}"></div><div class="field"><label>Date</label><input id="date" type="date" class="input" value="${e.date||''}"></div><div class="field"><label>Heure</label><input id="heure" class="input" value="${e.heure||''}"></div><div class="field"><label>Prix</label><input id="prix" class="input" value="${e.prix||''}"></div><div class="field"><label>Dress code</label><input id="dress" class="input" value="${e.dress||''}"></div><div class="field"><label>Itinéraire Google Maps</label><input id="itineraire" class="input" value="${e.itineraire||''}"></div><div class="field"><label>Briefing</label><textarea id="briefing">${e.briefing||''}</textarea></div></div><div class="row-actions"><button class="btn" onclick="saveEvent('${id||''}')">Enregistrer</button><button class="btn ghost" onclick="closeModal()">Annuler</button></div>`)}
-function saveEvent(id){let e=id?db.events.find(x=>x.id===id):{id:uid('e')}; Object.assign(e,{titre:$('#titre').value,lieu:$('#lieu').value,date:$('#date').value,heure:$('#heure').value,prix:$('#prix').value,dress:$('#dress').value,itineraire:$('#itineraire').value,briefing:$('#briefing').value,responsable:me().id}); if(!id)db.events.push(e);save();closeModal();eventsPage();toast('Événement enregistré')}
-function delEvent(id){if(confirm('Supprimer événement ?')){db.events=db.events.filter(e=>e.id!==id);db.assignments=db.assignments.filter(a=>a.eventId!==id);save();eventsPage()}}
-function assignPage(){let agents=db.users.filter(u=>u.role==='agent'); $('#content').innerHTML=`<div class="grid two"><div class="card"><h3>Assigner / Convoquer</h3><div class="field"><label>Événement</label><select id="evSel" class="select">${db.events.map(e=>`<option value="${e.id}">${e.titre}</option>`).join('')}</select></div><div class="field"><label>Agent</label><select id="agSel" class="select">${agents.map(a=>`<option value="${a.id}">${a.nom}</option>`).join('')}</select></div><div class="field"><label>Poste</label><select id="poste" class="select"><option>Accueil</option><option>Salle</option><option>VIP</option><option>Orientation</option><option>Vestiaire</option></select></div><button class="btn full" onclick="assign()">Assigner / Convoquer</button></div><div class="card"><h3>Dispatching visuel</h3>${dispatch()}</div></div><div class="card"><h3>Assignations</h3>${assignmentList(true)}</div>`}
-function assign(){let eventId=$('#evSel').value, agentId=$('#agSel').value; if(db.assignments.some(a=>a.eventId===eventId&&a.agentId===agentId))return toast('Agent déjà assigné'); db.assignments.push({id:uid('a'),eventId,agentId,poste:$('#poste').value,statut:'en_attente'});save();assignPage();toast('Convocation envoyée')}
-function revoke(id){db.assignments=db.assignments.filter(a=>a.id!==id);save();assignPage();toast('Agent révoqué')}
-function assignmentList(actions=false){if(!db.assignments.length)return '<div class="empty">Aucune assignation</div>';return `<table class="table"><tr><th>Agent</th><th>Événement</th><th>Poste</th><th>Statut</th>${actions?'<th>Action</th>':''}</tr>${db.assignments.map(a=>{let u=db.users.find(x=>x.id===a.agentId)||{}, e=db.events.find(x=>x.id===a.eventId)||{};return `<tr><td>${u.nom||'-'}</td><td>${e.titre||'-'}</td><td>${a.poste}</td><td><span class="status ${a.statut==='confirme'?'ok':a.statut==='refuse'?'no':'wait'}">${a.statut}</span></td>${actions?`<td><button class="btn danger small" onclick="revoke('${a.id}')">Révoquer</button></td>`:''}</tr>`}).join('')}</table>`}
-function dispatch(){let zones=['Accueil','Salle','VIP','Orientation','Vestiaire'];return `<div class="dispatch">${zones.map(z=>`<div class="zone"><h4>${z}</h4>${db.assignments.filter(a=>a.poste===z).map(a=>`<span class="chip">${(db.users.find(u=>u.id===a.agentId)||{}).nom||'-'}</span>`).join('')||'<span class="hint">Vide</span>'}</div>`).join('')}</div>`}
-function myEventsPage(){let u=me();let mine=db.assignments.filter(a=>a.agentId===u.id); $('#content').innerHTML=`<div class="grid">${mine.map(a=>{let e=db.events.find(x=>x.id===a.eventId)||{};return `<div class="card"><div class="section-head"><div><h3>${e.titre}</h3><p class="hint">${e.date} • ${e.heure} • ${e.lieu}</p></div><span class="status ${a.statut==='confirme'?'ok':a.statut==='refuse'?'no':'wait'}">${a.statut}</span></div><p>${e.briefing||''}</p><p>Poste : <b>${a.poste}</b> • Tenue : <b>${e.dress||'-'}</b></p><div class="row-actions"><button class="btn small" onclick="agentStatus('${a.id}','confirme')">Accepter</button><button class="btn danger small" onclick="agentStatus('${a.id}','refuse')">Refuser</button><a class="btn ghost small" href="${e.itineraire||'#'}" target="_blank">Itinéraire</a></div></div>`}).join('')||'<div class="empty">Aucun événement assigné</div>'}</div>`}
-function agentStatus(id,statut){let a=db.assignments.find(x=>x.id===id);a.statut=statut;save();myEventsPage();toast('Réponse envoyée')}
-function wardrobePage(){let can=me().role!=='agent';$('#content').innerHTML=`<div class="section-head"><h3>Garde-robe</h3>${can?'<button class="btn" onclick="wardrobeModal()">Ajouter item</button>':''}</div><div class="grid three">${db.wardrobe.map(w=>`<div class="card"><h3>${w.nom}</h3><p class="hint">${w.categorie}</p><b>${w.quantite}</b> disponibles <p><span class="status ok">${w.statut}</span></p>${can?`<div class="row-actions"><button class="btn ghost small" onclick="wardrobeModal('${w.id}')">Modifier</button><button class="btn danger small" onclick="delWardrobe('${w.id}')">Supprimer</button></div>`:''}</div>`).join('')||'<div class="empty">Aucun item</div>'}</div>`}
-function wardrobeModal(id){let w=id?db.wardrobe.find(x=>x.id===id):{};modal(`<h3>${id?'Modifier':'Ajouter'} item</h3><div class="form-grid"><div class="field"><label>Nom</label><input id="wnom" class="input" value="${w.nom||''}"></div><div class="field"><label>Catégorie</label><select id="wcat" class="select">${['Homme','Femme','Accessoires','Outils','Décorations'].map(c=>`<option ${w.categorie===c?'selected':''}>${c}</option>`).join('')}</select></div><div class="field"><label>Quantité</label><input id="wq" type="number" class="input" value="${w.quantite||0}"></div><div class="field"><label>Statut</label><input id="wstatut" class="input" value="${w.statut||'Disponible'}"></div></div><button class="btn" onclick="saveWardrobe('${id||''}')">Enregistrer</button>`)}
-function saveWardrobe(id){let w=id?db.wardrobe.find(x=>x.id===id):{id:uid('w')};Object.assign(w,{nom:$('#wnom').value,categorie:$('#wcat').value,quantite:+$('#wq').value,statut:$('#wstatut').value});if(!id)db.wardrobe.push(w);save();closeModal();wardrobePage()}
-function delWardrobe(id){if(confirm('Supprimer item ?')){db.wardrobe=db.wardrobe.filter(w=>w.id!==id);save();wardrobePage()}}
-function statsPage(){let u=me();let a=u.role==='agent'?db.assignments.filter(x=>x.agentId===u.id):db.assignments;let total=a.length, ok=a.filter(x=>x.statut==='confirme').length, no=a.filter(x=>x.statut==='refuse').length;$('#content').innerHTML=`<div class="grid cards"><div class="card stat"><div><span>Événements</span><b>${total}</b></div>${icon('event')}</div><div class="card stat"><div><span>Confirmés</span><b>${ok}</b></div>${icon('dash')}</div><div class="card stat"><div><span>Refusés</span><b>${no}</b></div>${icon('stats')}</div><div class="card stat"><div><span>Taux confirmation</span><b>${total?Math.round(ok/total*100):0}%</b></div>${icon('stats')}</div></div>`}
-function modal(html){let m=document.createElement('div');m.className='modal';m.innerHTML=`<div class="modal-card">${html}</div>`;document.body.appendChild(m)} function closeModal(){let m=$('.modal'); if(m)m.remove()}
+
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+const KEY = "nougatine_dark_v2";
+
+const icons = {
+  dashboard: "📊",
+  users: "👥",
+  events: "📅",
+  wardrobe: "🧥",
+  logout: "🚪"
+};
+
+function seed() {
+  return {
+    users: [
+      {
+        id: "u1",
+        nom: "Administrateur Général",
+        email: "admin@nougatine.sn",
+        password: "admin123",
+        role: "admin_general",
+        phone: "",
+        photo: ""
+      },
+      {
+        id: "u2",
+        nom: "Responsable Event",
+        email: "resp@nougatine.sn",
+        password: "resp123",
+        role: "responsable",
+        phone: "",
+        photo: ""
+      },
+      {
+        id: "u3",
+        nom: "Agent Accueil",
+        email: "agent@nougatine.sn",
+        password: "agent123",
+        role: "agent",
+        phone: "",
+        photo: ""
+      },
+      {
+        id: "u4",
+        nom: "Garde Robe",
+        email: "garde@nougatine.sn",
+        password: "garde123",
+        role: "garde_robe",
+        phone: "",
+        photo: ""
+      }
+    ],
+
+    events: [
+      {
+        id: "e1",
+        titre: "Salon Premium Dakar",
+        lieu: "King Fahd Palace",
+        date: "2026-06-15",
+        status: "Confirmé"
+      },
+      {
+        id: "e2",
+        titre: "Forum Business",
+        lieu: "CICAD",
+        date: "2026-06-18",
+        status: "En attente"
+      }
+    ],
+
+    wardrobe: [
+      {
+        id: "w1",
+        nom: "Tenue Hôtesse Noir",
+        stock: 12
+      },
+      {
+        id: "w2",
+        nom: "Costume Premium",
+        stock: 5
+      }
+    ],
+
+    current: null
+  };
+}
+
+let db = JSON.parse(localStorage.getItem(KEY) || "null") || seed();
+
+const save = () => {
+  localStorage.setItem(KEY, JSON.stringify(db));
+};
+
+function toast(text) {
+  const x = document.createElement("div");
+  x.className = "toast";
+  x.textContent = text;
+  document.body.appendChild(x);
+
+  setTimeout(() => x.remove(), 2500);
+}
+
+function avatar(photo, nom = "N") {
+  return photo
+    ? `<img class="avatar" src="${photo}" alt="">`
+    : `<div class="avatar">${nom[0]}</div>`;
+}
+
+function app() {
+  db.current ? renderShell() : renderLogin();
+}
+
+function renderLogin() {
+  $("#app").innerHTML = `
+    <div class="login">
+
+      <div class="login-left">
+        <img class="login-bg-logo" src="logo.png">
+
+        <h1>
+          Plateforme interne
+          Nougatine Accueil
+        </h1>
+
+        <p>
+          Gestion premium des agents,
+          responsables, évènements,
+          convocations et garde-robe.
+        </p>
+
+        <div class="tags">
+          <span>Dark mode</span>
+          <span>Photos agents</span>
+          <span>GitHub / Vercel</span>
+        </div>
+
+        <div class="demo">
+          Comptes test :
+          <br><br>
+
+          <b>admin@nougatine.sn</b> / admin123
+          <br>
+
+          <b>resp@nougatine.sn</b> / resp123
+          <br>
+
+          <b>agent@nougatine.sn</b> / agent123
+          <br>
+
+          <b>garde@nougatine.sn</b> / garde123
+        </div>
+      </div>
+
+      <div class="login-card">
+
+        <div class="tabs">
+          <button class="tab active">Connexion</button>
+        </div>
+
+        <h2>Connexion</h2>
+
+        <label>Email</label>
+        <input id="email" value="admin@nougatine.sn">
+
+        <label>Mot de passe</label>
+        <input id="pass" type="password" value="admin123">
+
+        <button class="primary" onclick="login()">
+          Se connecter
+        </button>
+
+      </div>
+
+    </div>
+  `;
+}
+
+function login() {
+  const email = $("#email").value.trim();
+  const pass = $("#pass").value.trim();
+
+  const user = db.users.find(
+    x => x.email === email && x.password === pass
+  );
+
+  if (!user) {
+    toast("Identifiants incorrects");
+    return;
+  }
+
+  db.current = user.id;
+  save();
+
+  renderShell();
+}
+
+function logout() {
+  db.current = null;
+  save();
+  renderLogin();
+}
+
+const me = () => db.users.find(x => x.id === db.current);
+
+function renderShell(page = "dashboard") {
+
+  const user = me();
+
+  $("#app").innerHTML = `
+    <div class="shell">
+
+      <aside class="sidebar">
+
+        <div class="brand">
+          <img src="logo.png">
+          <div>
+            <h3>Nougatine</h3>
+            <small>${user.role}</small>
+          </div>
+        </div>
+
+        <nav class="nav">
+
+          <button data-page="dashboard">
+            ${icons.dashboard}
+            Tableau de bord
+          </button>
+
+          <button data-page="users">
+            ${icons.users}
+            Agents
+          </button>
+
+          <button data-page="events">
+            ${icons.events}
+            Évènements
+          </button>
+
+          <button data-page="wardrobe">
+            ${icons.wardrobe}
+            Garde robe
+          </button>
+
+          <button onclick="logout()">
+            ${icons.logout}
+            Déconnexion
+          </button>
+
+        </nav>
+
+      </aside>
+
+      <main class="content">
+
+        <div class="topbar">
+
+          <div>
+            <h1 id="pageTitle"></h1>
+          </div>
+
+          <div class="top-user">
+            ${avatar(user.photo, user.nom)}
+            <span>${user.nom}</span>
+          </div>
+
+        </div>
+
+        <div id="page"></div>
+
+      </main>
+
+    </div>
+  `;
+
+  $$(".nav button[data-page]").forEach(btn => {
+    btn.onclick = () => renderShell(btn.dataset.page);
+  });
+
+  renderPage(page);
+}
+
+function renderPage(page) {
+
+  $("#pageTitle").textContent = pageLabel(page);
+
+  if (page === "dashboard") dashboardPage();
+  if (page === "users") usersPage();
+  if (page === "events") eventsPage();
+  if (page === "wardrobe") wardrobePage();
+}
+
+function pageLabel(page) {
+
+  return {
+    dashboard: "Tableau de bord",
+    users: "Gestion des agents",
+    events: "Évènements",
+    wardrobe: "Garde robe"
+  }[page];
+}
+
+function dashboardPage() {
+
+  $("#page").innerHTML = `
+    <div class="stats">
+
+      <div class="card stat">
+        <h3>${db.users.length}</h3>
+        <p>Agents & utilisateurs</p>
+      </div>
+
+      <div class="card stat">
+        <h3>${db.events.length}</h3>
+        <p>Évènements</p>
+      </div>
+
+      <div class="card stat">
+        <h3>${db.wardrobe.length}</h3>
+        <p>Articles garde robe</p>
+      </div>
+
+    </div>
+
+    <div class="card">
+      <h2>Bienvenue sur Nougatine Accueil</h2>
+
+      <p>
+        Plateforme interne premium pour la gestion
+        des agents événementiels.
+      </p>
+    </div>
+  `;
+}
+
+function usersPage() {
+
+  $("#page").innerHTML = `
+    <div class="grid">
+
+      ${db.users.map(u => `
+        <div class="card user-card">
+
+          ${avatar(u.photo, u.nom)}
+
+          <h3>${u.nom}</h3>
+
+          <p>${u.role}</p>
+
+          <small>${u.email}</small>
+
+        </div>
+      `).join("")}
+
+    </div>
+  `;
+}
+
+function eventsPage() {
+
+  $("#page").innerHTML = `
+    <div class="card">
+
+      <table>
+
+        <thead>
+          <tr>
+            <th>Évènement</th>
+            <th>Lieu</th>
+            <th>Date</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+          ${db.events.map(e => `
+            <tr>
+              <td>${e.titre}</td>
+              <td>${e.lieu}</td>
+              <td>${e.date}</td>
+              <td>${e.status}</td>
+            </tr>
+          `).join("")}
+
+        </tbody>
+
+      </table>
+
+    </div>
+  `;
+}
+
+function wardrobePage() {
+
+  $("#page").innerHTML = `
+    <div class="grid">
+
+      ${db.wardrobe.map(w => `
+        <div class="card">
+
+          <h3>${w.nom}</h3>
+
+          <p>
+            Stock :
+            <b>${w.stock}</b>
+          </p>
+
+        </div>
+      `).join("")}
+
+    </div>
+  `;
+}
+
 app();
