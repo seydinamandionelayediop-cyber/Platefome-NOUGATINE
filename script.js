@@ -1,6 +1,6 @@
 const supabaseClient = supabase.createClient(
   "https://rjnuoslhxwawiyvvtjlc.supabase.co",
-  "TON_ANON_KEY"
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJqbnVvc2xoeHdhd2l5dnZ0amxjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNjg3NTgsImV4cCI6MjA5NTY0NDc1OH0.nJUeFhELfY9UFtadmtPt1cUPqkGipEEwcj5eR5N-Zdc"
 );
 
 const $ = (s, r = document) => r.querySelector(s);
