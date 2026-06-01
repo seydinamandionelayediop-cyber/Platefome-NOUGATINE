@@ -1,3 +1,7 @@
+const supabaseClient = supabase.createClient(
+  "Thttps://rjnuoslhxwawiyvvtjlc.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJqbnVvc2xoeHdhd2l5dnZ0amxjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNjg3NTgsImV4cCI6MjA5NTY0NDc1OH0.nJUeFhELfY9UFtadmtPt1cUPqkGipEEwcj5eR5N-Zdc"
+);
 const $ = (s, r=document)=>r.querySelector(s); const $$=(s,r=document)=>[...r.querySelectorAll(s)];
 const KEY='nougatine_dark_v1';
 const icon=(name)=>({dash:'<svg class="ico" viewBox="0 0 24 24"><path d="M3 13h8V3H3zM13 21h8V11h-8zM13 3h8v6h-8zM3 21h8v-6H3z"/></svg>',users:'<svg class="ico" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',event:'<svg class="ico" viewBox="0 0 24 24"><path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></svg>',robe:'<svg class="ico" viewBox="0 0 24 24"><path d="M6 3h12l2 5-4 2v11H8V10L4 8z"/></svg>',stats:'<svg class="ico" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 16l4-5 3 3 5-8"/></svg>',map:'<svg class="ico" viewBox="0 0 24 24"><path d="M9 18l-6 3V6l6-3 6 3 6-3v15l-6 3-6-3z"/><path d="M9 3v15M15 6v15"/></svg>'}[name]||'');
