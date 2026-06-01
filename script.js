@@ -1,20 +1,19 @@
 const supabaseClient = supabase.createClient(
   "https://rjnuoslhxwawiyvvtjlc.supabase.co",
-  "TON_ANON_KEY_ICI"
+  "TON_ANON_KEY"
 );
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 
-const KEY = "nougatine_dark_v2";
+const KEY = "nougatine_dark_v1";
 
-const icons = {
-  dashboard: "📊",
-  users: "👥",
-  events: "📅",
-  wardrobe: "🧥",
-  logout: "🚪"
-};
+const icon = (name) => ({
+  dash: `<svg class="ico" viewBox="0 0 24 24"><path d="M3 13h8V3H3zm10 8h8V11h-8zM13 3v6h8V3zM3 21h8v-6H3z"/></svg>`,
+  users: `<svg class="ico" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zM8 11c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5C15 14.17 10.33 13 8 13zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>`,
+  events: `<svg class="ico" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v13c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 15H5V10h14v9z"/></svg>`,
+  wardrobe: `<svg class="ico" viewBox="0 0 24 24"><path d="M12 2l4 4-1.5 1.5L13 6v4h5v12h-3v-5H9v5H6V10h5V6L9.5 7.5 8 6l4-4z"/></svg>`
+}[name] || "");
 
 function seed() {
   return {
@@ -45,71 +44,28 @@ function seed() {
         role: "agent",
         phone: "",
         photo: ""
-      },
-      {
-        id: "u4",
-        nom: "Garde Robe",
-        email: "garde@nougatine.sn",
-        password: "garde123",
-        role: "garde_robe",
-        phone: "",
-        photo: ""
       }
     ],
-
-    events: [
-      {
-        id: "e1",
-        titre: "Salon Premium Dakar",
-        lieu: "King Fahd Palace",
-        date: "2026-06-15",
-        status: "Confirmé"
-      },
-      {
-        id: "e2",
-        titre: "Forum Business",
-        lieu: "CICAD",
-        date: "2026-06-18",
-        status: "En attente"
-      }
-    ],
-
-    wardrobe: [
-      {
-        id: "w1",
-        nom: "Tenue Hôtesse Noir",
-        stock: 12
-      },
-      {
-        id: "w2",
-        nom: "Costume Premium",
-        stock: 5
-      }
-    ],
-
     current: null
   };
 }
 
 let db = JSON.parse(localStorage.getItem(KEY) || "null") || seed();
 
-const save = () => {
-  localStorage.setItem(KEY, JSON.stringify(db));
-};
+const save = () => localStorage.setItem(KEY, JSON.stringify(db));
 
-function toast(text) {
-  const x = document.createElement("div");
+function toast(t) {
+  let x = document.createElement("div");
   x.className = "toast";
-  x.textContent = text;
+  x.textContent = t;
   document.body.appendChild(x);
-
-  setTimeout(() => x.remove(), 2500);
+  setTimeout(() => x.remove(), 2400);
 }
 
-function avatar(photo, nom = "N") {
-  return photo
-    ? `<img class="avatar" src="${photo}" alt="">`
-    : `<div class="avatar">${nom[0]}</div>`;
+function img(u, txt = "N") {
+  return u
+    ? `<img class="avatar" src="${u}" alt="">`
+    : `<div class="avatar">${txt[0] || "N"}</div>`;
 }
 
 function app() {
@@ -118,303 +74,242 @@ function app() {
 
 function renderLogin() {
   $("#app").innerHTML = `
-    <div class="login">
+  <div class="login">
 
-      <div class="login-left">
-        <img class="login-bg-logo" src="logo.png">
+    <img class="login-bg-logo" src="logo.png">
 
-        <h1>
-          Plateforme interne
-          Nougatine Accueil
-        </h1>
+    <div class="login-card">
+
+      <div class="hero">
+        <img class="hero-logo" src="logo.png">
+
+        <h1>Plateforme interne<br>Nougatine Accueil</h1>
 
         <p>
-          Gestion premium des agents,
-          responsables, évènements,
-          convocations et garde-robe.
+          Gestion premium des agents, responsables,
+          événements, convocations et garde-robe.
         </p>
 
-        <div class="tags">
+        <div class="chips">
           <span>Dark mode</span>
           <span>Photos agents</span>
           <span>GitHub / Vercel</span>
         </div>
 
-        <div class="demo">
+        <small>
           Comptes test :
-          <br><br>
-
-          <b>admin@nougatine.sn</b> / admin123
-          <br>
-
-          <b>resp@nougatine.sn</b> / resp123
-          <br>
-
-          <b>agent@nougatine.sn</b> / agent123
-          <br>
-
-          <b>garde@nougatine.sn</b> / garde123
-        </div>
+          admin@nougatine.sn / admin123
+        </small>
       </div>
 
-      <div class="login-card">
-
+      <div class="login-form">
         <div class="tabs">
           <button class="tab active">Connexion</button>
         </div>
 
         <h2>Connexion</h2>
 
-        <label>Email</label>
-        <input id="email" value="admin@nougatine.sn">
-
-        <label>Mot de passe</label>
-        <input id="pass" type="password" value="admin123">
+        <input id="email" placeholder="Email">
+        <input id="pass" type="password" placeholder="Mot de passe">
 
         <button class="primary" onclick="login()">
           Se connecter
         </button>
 
+        <div class="demo-users">
+          Responsable : resp@nougatine.sn / resp123 <br>
+          Agent : agent@nougatine.sn / agent123
+        </div>
       </div>
 
     </div>
+  </div>
   `;
 }
 
 function login() {
-  const email = $("#email").value.trim();
-  const pass = $("#pass").value.trim();
-
-  const user = db.users.find(
-    x => x.email === email && x.password === pass
+  let u = db.users.find(
+    x =>
+      x.email === $("#email").value.trim() &&
+      x.password === $("#pass").value
   );
 
-  if (!user) {
-    toast("Identifiants incorrects");
-    return;
-  }
+  if (!u) return toast("Identifiants incorrects");
 
-  db.current = user.id;
+  db.current = u.id;
   save();
-
-  renderShell();
+  app();
 }
 
 function logout() {
   db.current = null;
   save();
-  renderLogin();
+  app();
 }
 
 const me = () => db.users.find(x => x.id === db.current);
 
 function renderShell(page = "dashboard") {
-
-  const user = me();
+  let u = me();
 
   $("#app").innerHTML = `
-    <div class="shell">
+  <div class="shell">
 
-      <aside class="sidebar">
+    <aside class="side">
 
-        <div class="brand">
-          <img src="logo.png">
-          <div>
-            <h3>Nougatine</h3>
-            <small>${user.role}</small>
-          </div>
+      <div class="brand">
+        <img class="logo" src="logo.png">
+        <div>
+          <b>Nougatine</b>
+          <small>${u.role}</small>
         </div>
+      </div>
 
-        <nav class="nav">
+      <nav class="nav">
+        <button onclick="renderPage('dashboard')">
+          ${icon("dash")} Tableau de bord
+        </button>
 
-          <button data-page="dashboard">
-            ${icons.dashboard}
-            Tableau de bord
-          </button>
+        <button onclick="renderPage('agents')">
+          ${icon("users")} Agents
+        </button>
 
-          <button data-page="users">
-            ${icons.users}
-            Agents
-          </button>
+        <button onclick="renderPage('events')">
+          ${icon("events")} Événements
+        </button>
 
-          <button data-page="events">
-            ${icons.events}
-            Évènements
-          </button>
+        <button onclick="renderPage('wardrobe')">
+          ${icon("wardrobe")} Garde-robe
+        </button>
+      </nav>
 
-          <button data-page="wardrobe">
-            ${icons.wardrobe}
-            Garde robe
-          </button>
+      <button class="logout" onclick="logout()">
+        Déconnexion
+      </button>
 
-          <button onclick="logout()">
-            ${icons.logout}
-            Déconnexion
-          </button>
+    </aside>
 
-        </nav>
+    <main class="content">
+      <header class="topbar">
+        <h1 id="pageTitle">Dashboard</h1>
 
-      </aside>
-
-      <main class="content">
-
-        <div class="topbar">
-
-          <div>
-            <h1 id="pageTitle"></h1>
-          </div>
-
-          <div class="top-user">
-            ${avatar(user.photo, user.nom)}
-            <span>${user.nom}</span>
-          </div>
-
+        <div class="userbox">
+          ${img(u.photo, u.nom)}
+          <span>${u.nom}</span>
         </div>
+      </header>
 
-        <div id="page"></div>
+      <section id="content"></section>
+    </main>
 
-      </main>
-
-    </div>
+  </div>
   `;
-
-  $$(".nav button[data-page]").forEach(btn => {
-    btn.onclick = () => renderShell(btn.dataset.page);
-  });
 
   renderPage(page);
 }
 
-function renderPage(page) {
+function renderPage(p) {
+  $("#pageTitle").textContent = p;
 
-  $("#pageTitle").textContent = pageLabel(page);
-
-  if (page === "dashboard") dashboardPage();
-  if (page === "users") usersPage();
-  if (page === "events") eventsPage();
-  if (page === "wardrobe") wardrobePage();
+  if (p === "dashboard") dashboard();
+  if (p === "agents") agents();
+  if (p === "events") events();
+  if (p === "wardrobe") wardrobe();
 }
 
-function pageLabel(page) {
+function dashboard() {
+  $("#content").innerHTML = `
+  <div class="cards">
 
-  return {
-    dashboard: "Tableau de bord",
-    users: "Gestion des agents",
-    events: "Évènements",
-    wardrobe: "Garde robe"
-  }[page];
-}
-
-function dashboardPage() {
-
-  $("#page").innerHTML = `
-    <div class="stats">
-
-      <div class="card stat">
-        <h3>${db.users.length}</h3>
-        <p>Agents & utilisateurs</p>
-      </div>
-
-      <div class="card stat">
-        <h3>${db.events.length}</h3>
-        <p>Évènements</p>
-      </div>
-
-      <div class="card stat">
-        <h3>${db.wardrobe.length}</h3>
-        <p>Articles garde robe</p>
-      </div>
-
+    <div class="card">
+      <h3>Agents</h3>
+      <strong>${db.users.length}</strong>
     </div>
 
     <div class="card">
-      <h2>Bienvenue sur Nougatine Accueil</h2>
-
-      <p>
-        Plateforme interne premium pour la gestion
-        des agents événementiels.
-      </p>
+      <h3>Événements</h3>
+      <strong>12</strong>
     </div>
-  `;
-}
 
-function usersPage() {
-
-  $("#page").innerHTML = `
-    <div class="grid">
-
-      ${db.users.map(u => `
-        <div class="card user-card">
-
-          ${avatar(u.photo, u.nom)}
-
-          <h3>${u.nom}</h3>
-
-          <p>${u.role}</p>
-
-          <small>${u.email}</small>
-
-        </div>
-      `).join("")}
-
-    </div>
-  `;
-}
-
-function eventsPage() {
-
-  $("#page").innerHTML = `
     <div class="card">
-
-      <table>
-
-        <thead>
-          <tr>
-            <th>Évènement</th>
-            <th>Lieu</th>
-            <th>Date</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-
-        <tbody>
-
-          ${db.events.map(e => `
-            <tr>
-              <td>${e.titre}</td>
-              <td>${e.lieu}</td>
-              <td>${e.date}</td>
-              <td>${e.status}</td>
-            </tr>
-          `).join("")}
-
-        </tbody>
-
-      </table>
-
+      <h3>Présences</h3>
+      <strong>94%</strong>
     </div>
+
+  </div>
   `;
 }
 
-function wardrobePage() {
+function agents() {
+  $("#content").innerHTML = `
+  <div class="grid">
+    ${db.users.map(
+      u => `
+      <div class="agent-card">
+        ${img(u.photo, u.nom)}
+        <h3>${u.nom}</h3>
+        <p>${u.role}</p>
+        <small>${u.email}</small>
+      </div>
+    `
+    ).join("")}
+  </div>
+  `;
+}
 
-  $("#page").innerHTML = `
-    <div class="grid">
+function events() {
+  $("#content").innerHTML = `
+  <div class="table">
+    <h2>Événements</h2>
 
-      ${db.wardrobe.map(w => `
-        <div class="card">
+    <table>
+      <tr>
+        <th>Titre</th>
+        <th>Lieu</th>
+        <th>Date</th>
+      </tr>
 
-          <h3>${w.nom}</h3>
+      <tr>
+        <td>Défilé Mode</td>
+        <td>Dakar</td>
+        <td>15 Juin</td>
+      </tr>
 
-          <p>
-            Stock :
-            <b>${w.stock}</b>
-          </p>
+      <tr>
+        <td>Salon Premium</td>
+        <td>Radisson</td>
+        <td>22 Juin</td>
+      </tr>
+    </table>
+  </div>
+  `;
+}
 
-        </div>
-      `).join("")}
+function wardrobe() {
+  $("#content").innerHTML = `
+  <div class="table">
+    <h2>Garde-robe</h2>
 
-    </div>
+    <table>
+      <tr>
+        <th>Tenue</th>
+        <th>Taille</th>
+        <th>Stock</th>
+      </tr>
+
+      <tr>
+        <td>Robe Hôtesse</td>
+        <td>M</td>
+        <td>12</td>
+      </tr>
+
+      <tr>
+        <td>Costume Event</td>
+        <td>L</td>
+        <td>7</td>
+      </tr>
+    </table>
+  </div>
   `;
 }
 
