@@ -11,7 +11,49 @@ function toast(t){let x=document.createElement('div');x.className='toast';x.text
 function img(u,txt='N'){return u?`<img class="avatar" src="${u}" alt="">`:`<div class="avatar">${txt[0]||'N'}</div>`}
 function app(){ db.current ? renderShell() : renderLogin(); }
 function renderLogin(){ $('#app').innerHTML=`<div class="login"><img class="login-bg-logo" src="logo.png"><div class="login-card"><div class="hero"><div><img class="logo" src="logo.png"><h1>Plateforme interne Nougatine Accueil</h1><p>Plateforme premium de gestions des agents, responsables, événements, convocations et garde-robe.</p><div class="badge-row"><span class="badge"></span><span class="badge"></span><span class="badge"></span></div></div></div><div class="login-form"><div class="tabs"><button class="tab active">Connexion</button><button class="tab" onclick="showFirstAdmin()">1er admin</button></div><h2>Connexion</h2><div class="field"><label>Email</label><input id="email" class="input" placeholder="Email""></div><div class="field"><label>Mot de passe</label><input id="pass" class="input" type="password" placeholder="Mot de passe"></div><button class="btn full" onclick="login()">Se connecter</button><p class="hint"></p></div></div></div>`;}
-function login(){let u=db.users.find(x=>x.email===$('#email').value.trim()&&x.password===$('#pass').value); if(!u)return toast('Identifiants incorrects'); db.current=u.id; save(); app();}
+async function login(){
+  const email = $('#email').value.trim();
+  const password = $('#pass').value;
+
+  const { data, error } = await supabaseClient.auth.signInWithPassword({
+    email,
+    password
+  });
+
+  if(error){
+    toast("Identifiants incorrects");
+    console.log(error);
+    return;
+  }
+
+  const userId = data.user.id;
+
+  const { data: profile, error: profileError } = await supabaseClient
+    .from("profiles")
+    .select("*")
+    .eq("id", userId)
+    .single();
+
+  if(profileError || !profile){
+    toast("Profil introuvable");
+    console.log(profileError);
+    return;
+  }
+
+  db.current = profile.id;
+  db.users = db.users.filter(u => u.id !== profile.id);
+  db.users.push({
+    id: profile.id,
+    nom: profile.nom,
+    email: profile.email,
+    role: profile.role,
+    phone: profile.telephone || "",
+    photo: profile.photo_url || ""
+  });
+
+  save();
+  app();
+}
 function logout(){db.current=null;save();app()} const me=()=>db.users.find(u=>u.id===db.current);
 function renderShell(page='dashboard'){let u=me();let nav=[]; if(u.role==='admin_general') nav=['dashboard','responsables','agents','events','assign','wardrobe','stats']; if(u.role==='responsable') nav=['dashboard','agents','events','assign','wardrobe','stats']; if(u.role==='agent') nav=['dashboard','myEvents','stats']; if(u.role==='garde_robe') nav=['dashboard','wardrobe'];
 $('#app').innerHTML=`<div class="shell"><aside class="side" id="side"><div class="brand"><img src="logo.png"><div><strong>Nougatine</strong><span>Accueil interne</span></div></div><nav class="nav">${nav.map(n=>`<button data-page="${n}">${icon(n==='responsables'||n==='agents'?'users':n==='events'||n==='myEvents'||n==='assign'?'event':n==='wardrobe'?'robe':n==='stats'?'stats':'dash')} ${label(n)}</button>`).join('')}</nav><div class="side-foot"><button class="btn ghost full" onclick="logout()">Déconnexion</button></div></aside><main class="main"><header class="topbar"><button class="btn ghost menu" onclick="$('#side').classList.toggle('open')">☰</button><div><h2 id="pageTitle">Dashboard</h2><p id="roleLabel" class="hint">${roleName(u.role)}</p></div><div class="pill">${img(u.photo,u.nom)}<span>${u.nom}</span></div></header><section id="content"></section></main></div>`; $$('.nav button').forEach(b=>b.onclick=()=>renderPage(b.dataset.page)); renderPage(page)}
